@@ -161,7 +161,7 @@ class MetaLearingClassification(nn.Module):
         if fast_weights is None:
             fast_weights = self.net.parameters()
 
-        grad = torch.autograd.grad(loss, fast_weights, allow_unused=False)
+        grad = torch.autograd.grad(loss, fast_weights, allow_unused=False, create_graph=True)
 
         fast_weights = list(
             map(lambda p: p[1] - self.update_lr * p[0] if p[1].learn else p[1], zip(grad, fast_weights)))
