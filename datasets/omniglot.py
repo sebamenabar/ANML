@@ -132,12 +132,14 @@ class Omniglot(data.Dataset):
             self.images = torch.stack(images)
 
             print(self.images.size())
-            print(self.targets)
+            # print(self.targets)
 
             self.targets = torch.as_tensor(self.targets, device=device)
             print(self.targets.size())
 
-        print("Total classes = ", np.max(self.targets))
+            print("Total classes = ", self.targets.max())
+        else:
+            print("Total classes = ", np.max(self.targets))
 
     def __len__(self):
         return len(self.data)
