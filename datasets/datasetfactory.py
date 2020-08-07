@@ -26,10 +26,10 @@ class DatasetFactory:
                 return om.Omniglot(
                     "../data/omni",
                     background=background,
+                    all=all,
                     download=True,
                     train=train,
                     transform=train_transform,
-                    all=all,
                     prefetch_gpu=prefetch_gpu,
                     device=device,
                 )
@@ -38,6 +38,8 @@ class DatasetFactory:
                     path,
                     download=True,
                     background=train,
+                    train=train,
+                    all=all,
                     transform=train_transform,
                     prefetch_gpu=prefetch_gpu,
                     device=device,

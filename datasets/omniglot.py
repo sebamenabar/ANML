@@ -11,6 +11,7 @@ import torch
 import torchvision.transforms as transforms
 from .utils import download_url, check_integrity, list_dir, list_files
 
+from tqdm import tqdm
 
 class Omniglot(data.Dataset):
     """`Omniglot <https://github.com/brendenlake/omniglot>`_ Dataset.
@@ -110,7 +111,7 @@ class Omniglot(data.Dataset):
         if prefetch_gpu:
             images = []
             print("Prefetching data to gpu")
-            for index, image_name in enumerate(self.data):
+            for index, image_name in tqdm(enumerate(self.data), ncols=0, total=len(self.data)):
 
                 character_class = self.targets[index]
                 image_path = join(
@@ -127,9 +128,9 @@ class Omniglot(data.Dataset):
                 self.transform = transforms.Compose([transforms.ToTensor(), normalize])
                 if self.transform is not None:
                     image = self.transform(image)
-                image = image.to(device)
+                # image = image.to(device)
                 images.append(image)
-            self.images = torch.stack(images)
+            self.images = torch.stack(images).to(device)
 
             print(self.images.size())
             # print(self.targets)
@@ -151,15 +152,19 @@ class Omniglot(data.Dataset):
         Returns:
             tuple: (image, target) where target is index of the target character class.
         """
+
+        if self.prefetch_gpu:
+            image = self.images[index]
+            character_class = self.targets[index]
+            return image, character_class
+
         image_name = self.data[index]
         character_class = self.targets[index]
         image_path = join(
             self.target_folder, self._characters[character_class], image_name
         )
 
-        if self.prefetch_gpu:
-            image = self.images[index]
-        elif image_path not in self.images_cached:
+        if image_path not in self.images_cached:
             image = Image.open(image_path, mode="r").convert("RGB")  # L
             image = image.resize((28, 28), resample=Image.LANCZOS)
             image = np.array(image, dtype=np.float32)

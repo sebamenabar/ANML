@@ -30,8 +30,11 @@ def main(args):
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
+        use_cuda = True
     else:
         device = torch.device("cpu")
+        use_cuda = False
+
 
     dataset = df.DatasetFactory.get_dataset(
         args.dataset,
@@ -56,7 +59,7 @@ def main(args):
     )
 
     sampler = ts.SamplerFactory.get_sampler(
-        args.dataset, args.classes, dataset, dataset_test
+        args.dataset, args.classes, dataset, dataset_test, prefetch_gpu=args.prefetch_gpu, use_cuda=use_cuda,
     )
 
     config = mf.ModelFactory.get_model(args.treatment, args.dataset)
