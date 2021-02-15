@@ -18,7 +18,7 @@ logger = logging.getLogger('experiment')
 def main(args):
     utils.set_seed(args.seed)
 
-    my_experiment = experiment(args.name, args, "../results/", commit_changes=args.commit)
+    my_experiment = experiment(args.name, args, "./results/", commit_changes=args.commit)
     writer = SummaryWriter(my_experiment.path + "tensorboard")
 
     logger = logging.getLogger('experiment')

@@ -88,6 +88,10 @@ class MetaLearingClassification(nn.Module):
 
         counter = 0
 
+        # print(iterators)
+        # print(it2)
+        # print(steps)
+
         class_cur = 0
         class_to_reset = 0
         for it1 in iterators:
@@ -151,6 +155,8 @@ class MetaLearingClassification(nn.Module):
         x_rand = torch.cat([x_rand, x_rand_temp], 1)
         y_rand = torch.cat([y_rand, y_rand_temp], 1)
 
+        # print(x_traj.size(), y_traj.size(), x_rand.size(), y_rand.size())
+
         return x_traj, y_traj, x_rand, y_rand
 
     def inner_update(self, x, fast_weights, y, bn_training):
@@ -161,7 +167,7 @@ class MetaLearingClassification(nn.Module):
         if fast_weights is None:
             fast_weights = self.net.parameters()
 
-        grad = torch.autograd.grad(loss, fast_weights, allow_unused=False)
+        grad = torch.autograd.grad(loss, fast_weights, allow_unused=False, retain_graph=True, create_graph=True)
 
         fast_weights = list(
             map(lambda p: p[1] - self.update_lr * p[0] if p[1].learn else p[1], zip(grad, fast_weights)))
@@ -212,6 +218,8 @@ class MetaLearingClassification(nn.Module):
 
         fast_weights = self.inner_update(x_traj[0], None, y_traj[0], False)
         
+        # print(x_traj.shape)
+
         for k in range(1, self.update_step):
             # Doing inner updates using fast weights
             fast_weights = self.inner_update(x_traj[k], fast_weights, y_traj[k], False)
